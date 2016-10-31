@@ -1,6 +1,7 @@
 package main
 import (
-	"fmt"
+	//"fmt"
+	"net/http"
 	"io/ioutil"
 )
 
@@ -23,9 +24,49 @@ func loadPage(title string) (*Page, error) {
 	return &Page{Title: title, Body: body}, nil
 }
 
+
+/*func rootHandler(w http.ResponseWriter, r *http.Request) {
+	title := r.URL.Path[len("/view/"):]
+	p, _ := loadPage(title)
+	fmt.Fprintf(w, "<h1>%s<h1><div>%s</div>", p.Title, p.Body)
+}*/
+
+func rootHandler(w http.ResponseWriter, r *http.Request){
+	if(session["nick"]!=nil){
+		chatHandler(w, r)
+		return
+	}
+	p := &Page{Title: string(nil), Body: nil}
+	t, _ := template.ParseFiles("index.html")
+	t.Execute(w, p)
+}
+
+func chatHandler(w http.ResponseWriter, r *http.Request){
+	p, _ := loadPage("chatLogs")
+	t, _ := template.ParseFiles("chat.html")
+	t.Execute(w, p)
+}
+
+func sendHandler(w http.ResponseWriter, r *http.Request){
+	p, _ := loadPage("chatLogs")
+	body := session["nick"]
+	body = body + " : " r.FormValue("message")
+	body = string(p.Body) + body
+    p = &Page{Title: "chatLogs", Body: []byte(body)}
+    p.save()
+    http.Redirect(w, r, "/chat/", http.StatusFound)
+}
+	
 func main(){
-	p1 := &Page{Title : "Test page", Body: []byte("Some random string")}
+/*	p1 := &Page{Title : "view", Body: []byte("Some random string")}
 	p1.save()
-	p2, _ := loadPage("Test page")
+	p2, _ := loadPage("view")
 	fmt.Println(string(p2.Body))
+*/
+	http.HandleFunc("/", rootHandler)
+	http.HandleFunc("/login/", loginHandler)
+	http.HandleFunc("/chat/", chatHandler)
+	http.HandleFunc("/send/", sendHandler)
+	http.HandleFunc("/logout/", logoutHandler)
+	http.ListenAndServe(":8080", nil)
 }
