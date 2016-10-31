@@ -34,5 +34,5 @@ func main() {
 	http.HandleFunc("/show", showHandler)
 	fmt.Println("Server listening on port 8080")
 	//Used when we are not using gorilla's routing library to prevent memory leak
-	http.ListenAndServe(":8080", context.ClearHandler(http.DefaultServeMux))
+	http.ListenAndServe(":8080", context.ClearHandler(http.DefaultServeMux)
 }
