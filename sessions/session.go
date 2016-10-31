@@ -15,7 +15,6 @@ func MyHandler(w http.ResponseWriter, r *http.Request) {
 	//Get a session. Get() will always return a session, even if empty.
 	// We are ignoring errors
 	session, _ := store.Get(r, "session0")
-
 	//set some session values
 	session.Values["foo"] = "bar"
 	session.Values["namit"] = "kumar"
@@ -26,8 +25,9 @@ func showHandler(w http.ResponseWriter, r *http.Request) {
 	//Fetching session0 created earlier
 	session, _ := store.Get(r, "session0")
 	//printing value of the key "namit" stored in the cookie during previous session
-	fmt.Fprintf(w, "The Values for %s is = %s", "namit", session.Values["namit"])
-
+	for key, value := range session.Values {
+		fmt.Fprintf(w, "\nThe Values for %s is = %s", key, value)
+	}
 }
 func main() {
 	http.HandleFunc("/add", MyHandler)
@@ -35,5 +35,8 @@ func main() {
 	fmt.Println("Server listening on port 8080")
 	//Used when we are not using gorilla's routing library to prevent memory leak
 	http.ListenAndServe(":8080", context.ClearHandler(http.DefaultServeMux))
+<<<<<<< HEAD
 	//	fmt.Println("Server started on 127.0.0.1:8080")
+=======
+>>>>>>> 8bdb1df6b46479a3e1094ef27b0356dc6462d84d
 }
